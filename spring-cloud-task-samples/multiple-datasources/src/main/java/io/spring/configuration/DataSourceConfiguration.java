@@ -18,8 +18,12 @@ package io.spring.configuration;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.config.java.AbstractCloudConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
@@ -27,19 +31,42 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
  * @author Michael Minella
  */
 @Configuration
-public class DataSourceConfiguration {
+@Profile("cloud")
+public class DataSourceConfiguration extends AbstractCloudConfig {
 
-	@Bean
+	@Bean(name = "taskDataSource")
+	public DataSource taskDataSource() {
+		return connectionFactory().dataSource("myappdb");
+	}
+
+
+	/// @Primary will let Spring Data JPA autoconfig use the following bean definitions
+
+	@Primary
+	@Bean(name = "dataSource")
 	public DataSource dataSource() {
-		return new EmbeddedDatabaseBuilder()
-			.setType(EmbeddedDatabaseType.HSQL)
-			.build();
+		return connectionFactory().dataSource("relational-7f051331-ecd4-4356-b488-642adb9f07b0");
 	}
 
-	@Bean
-	public DataSource secondDataSource() {
-		return new EmbeddedDatabaseBuilder()
-			.setType(EmbeddedDatabaseType.H2)
-			.build();
-	}
 }
+
+///*
+//@Configuration
+//@Profile("!cloud")
+//public class DataSourceConfiguration {
+//
+//	@Bean
+//	public DataSource dataSource() {
+//		return new EmbeddedDatabaseBuilder()
+//			.setType(EmbeddedDatabaseType.HSQL)
+//			.build();
+//	}
+//
+//	@Bean
+//	public DataSource secondDataSource() {
+//		return new EmbeddedDatabaseBuilder()
+//			.setType(EmbeddedDatabaseType.H2)
+//			.build();
+//	}
+//}
+//*/
