@@ -36,6 +36,7 @@ public class DataSourceConfiguration extends AbstractCloudConfig {
 
 	@Bean(name = "taskDataSource")
 	public DataSource taskDataSource() {
+		System.out.println("Creating taskDataSource");
 		return connectionFactory().dataSource("myappdb");
 	}
 
@@ -45,7 +46,8 @@ public class DataSourceConfiguration extends AbstractCloudConfig {
 	@Primary
 	@Bean(name = "dataSource")
 	public DataSource dataSource() {
-		return connectionFactory().dataSource("relational-7f051331-ecd4-4356-b488-642adb9f07b0");
+		System.out.println("Creating scdf dataSource");
+		return connectionFactory().dataSource("relational-5b87cd56-fa4a-4a0b-a392-8c1ea57b3698");
 	}
 
 }
