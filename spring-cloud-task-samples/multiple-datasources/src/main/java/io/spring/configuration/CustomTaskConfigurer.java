@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 public class CustomTaskConfigurer extends DefaultTaskConfigurer {
 
 	@Autowired
-	public CustomTaskConfigurer(@Qualifier("secondDataSource") DataSource dataSource) {
+	public CustomTaskConfigurer(@Qualifier("dataSource") DataSource dataSource) {
 		super(dataSource);
 	}
 }
