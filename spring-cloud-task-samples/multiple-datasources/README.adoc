@@ -1,11 +1,14 @@
 = Multiple DataSources Sample Task
 
 This is a Spring Boot application that utilizes two DataSources and explicitly configures
-which one to be used for the Spring Cloud Task repository.
+which one to be used for the Spring Cloud Task repository.  At this time, the app uses the cloud profile, and is intended to be run on Tanzu Application Service.
 
 == Requirements:
 
 * Java 8 or Above
+* Tanzu Application Service instance
+* Spring Cloud Data Flow for VMware Tanzu
+* Tanzu MySQL
 
 == Classes:
 
@@ -21,9 +24,41 @@ which one to be used for the Spring Cloud Task repository.
 $ mvn clean package
 ----
 
-== Run:
+== Run on TAS:
 
+. Create a MySQL service instance for your app, this will be the datasource you want to read or write business data from/to.
++
 [source,shell,indent=2]
 ----
-$ java -jar target/multiple-datasources-2.2.2.RELEASE.jar
+$ cf create-service p.mysql db-small myappdb
+----
+. Create a SCDF service instance
++
+[source,shell,indent=2]
+----
+cf create-service p-dataflow standard data-flow1 -c '{ "relational-data-service": { "name": "p.mysql", "plan": "db-small" }, "messaging-data-service": { "name": "p-rabbitmq", "plan": "standard" }, "skipper-relational": { "name": "p.mysql", "plan": "db-small" }, "maven.remote-repositories.repo1.url":"<myRepo>", "maven.remote-repositories.repo1.auth.username":"<myRepoUsername>", "maven.remote-repositories.repo1.auth.password":"<myRepoPassword>"}'
+----
+. Run the `cf services` command to get the name of the SCDF service instance proxy (eg. something like `relational-5b87cd56-fa4a-4a0b-a392-8c1ea57b3698`).  Update the `dataSource` bean in the `DatasourceConfiguration` class with the service instance name.  Deploy the updated JAR file to your repository.
+. Register the task application, either using the SCDF management UI or the SCDF shell CF plugin:
++
+[source,shell,indent=2]
+----
+dataflow:>app register --name multiple-datasources --type task --uri maven://io.spring.cloud:multiple-datasources:2.3.0-SNAPSHOT
+Successfully registered application 'task:multiple-datasources'
+----
+. Create the task.
++
+[source,shell,indent=2]
+----
+dataflow:>task create myTask --definition "multiple-datasources"
+Created new task 'myTask'
+dataflow:>task launch --name myTask --properties "deployer.multiple-datasources.cloudfoundry.services=myappdb,relational-5b87cd56-fa4a-4a0b-a392-8c1ea57b3698"
+Launched task 'myTask' with execution id 8
+----
+. Launch the task, passing in the 2 database service instance names to bind to.
++
+[source,shell,indent=2]
+----
+dataflow:>task launch --name myTask --properties "deployer.multiple-datasources.cloudfoundry.services=myappdb,relational-5b87cd56-fa4a-4a0b-a392-8c1ea57b3698"
+Launched task 'myTask' with execution id 8
 ----
