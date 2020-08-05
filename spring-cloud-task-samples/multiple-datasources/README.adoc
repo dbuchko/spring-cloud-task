@@ -52,8 +52,6 @@ Successfully registered application 'task:multiple-datasources'
 ----
 dataflow:>task create myTask --definition "multiple-datasources"
 Created new task 'myTask'
-dataflow:>task launch --name myTask --properties "deployer.multiple-datasources.cloudfoundry.services=myappdb,relational-5b87cd56-fa4a-4a0b-a392-8c1ea57b3698"
-Launched task 'myTask' with execution id 8
 ----
 . Launch the task, passing in the 2 database service instance names to bind to.
 +
