@@ -36,7 +36,7 @@ $ cf create-service p.mysql db-small myappdb
 +
 [source,shell,indent=2]
 ----
-cf create-service p-dataflow standard data-flow1 -c '{ "relational-data-service": { "name": "p.mysql", "plan": "db-small" }, "messaging-data-service": { "name": "p-rabbitmq", "plan": "standard" }, "skipper-relational": { "name": "p.mysql", "plan": "db-small" }, "maven.remote-repositories.repo1.url":"<myRepo>", "maven.remote-repositories.repo1.auth.username":"<myRepoUsername>", "maven.remote-repositories.repo1.auth.password":"<myRepoPassword>"}'
+cf create-service p-dataflow standard data-flow1 -c '{ "relational-data-service": { "name": "p.mysql", "plan": "db-small" }, "messaging-data-service": { "name": "p-rabbitmq", "plan": "standard" }, "skipper-relational": { "name": "p.mysql", "plan": "db-small" }, "scheduler": {"name": "scheduler-for-pcf", "plan": "standard"}, "maven.remote-repositories.repo1.url":"<myRepo>", "maven.remote-repositories.repo1.auth.username":"<myRepoUsername>", "maven.remote-repositories.repo1.auth.password":"<myRepoPassword>"}'
 ----
 . Run the `cf services` command to get the name of the SCDF service instance proxy (eg. something like `relational-5b87cd56-fa4a-4a0b-a392-8c1ea57b3698`).  Update the `dataSource` bean in the `DatasourceConfiguration` class with the service instance name.  Deploy the updated JAR file to your repository.
 . Register the task application, either using the SCDF management UI or the SCDF shell CF plugin:
@@ -61,4 +61,9 @@ Launched task 'myTask' with execution id 8
 ----
 dataflow:>task launch --name myTask --properties "deployer.multiple-datasources.cloudfoundry.services=myappdb,relational-5b87cd56-fa4a-4a0b-a392-8c1ea57b3698"
 Launched task 'myTask' with execution id 8
+----
+. Alternatively, schedule the task (assuming you've bound the SCDF server to a scheduler instance).
+[source,shell,indent=2]
+----
+dataflow:>task schedule create --name demoSched --definitionName "myTask" --expression "*/1 * ? * *" --properties "deployer.multiple-datasources.cloudfoundry.services=myappdb,relational-5b87cd56-fa4a-4a0b-a392-8c1ea57b3698"
 ----
