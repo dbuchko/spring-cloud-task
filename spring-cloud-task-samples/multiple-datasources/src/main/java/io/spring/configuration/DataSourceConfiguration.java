@@ -51,24 +51,3 @@ public class DataSourceConfiguration extends AbstractCloudConfig {
 	}
 
 }
-
-///*
-//@Configuration
-//@Profile("!cloud")
-//public class DataSourceConfiguration {
-//
-//	@Bean
-//	public DataSource dataSource() {
-//		return new EmbeddedDatabaseBuilder()
-//			.setType(EmbeddedDatabaseType.HSQL)
-//			.build();
-//	}
-//
-//	@Bean
-//	public DataSource secondDataSource() {
-//		return new EmbeddedDatabaseBuilder()
-//			.setType(EmbeddedDatabaseType.H2)
-//			.build();
-//	}
-//}
-//*/
